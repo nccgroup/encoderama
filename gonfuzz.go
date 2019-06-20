@@ -25,37 +25,39 @@ func main() {
 		os.Exit(1)
 	}
 
-	// If we got this far it means that the target string has been passed at
-	// the command line, if stdin or inputfile have also been passed, throw an
-	// error
-	fmt.Printf("%d\n", flag.NArg())
-	if *stdinPtr || *inputFilePtr != "" {
-		log.Fatal("Pass a string either by: an single string on the command line, from an input file with -f or via stdin with -stdin")
+	// Workout if more than one mode has been selected
+	modeCount := 0
+
+	if *stdinPtr {
+		modeCount++
 	}
 
-	// The final arg should be a single input string if stdin or file input
-	// isn't used
-	input := flag.Arg(flag.NArg() - 1)
+	if *inputFilePtr != "" {
+		modeCount++
+	}
 
-	//TODO ensure unicode support
-	if isASCII(input) {
-		fmt.Println("Input string contains non-ascii chars... issues may appear")
+	if flag.NArg() > 0 {
+		modeCount++
+	}
+
+	if modeCount > 1 {
+		log.Fatal("Pass a string either by: strings seperated by spaces on the command line, from an input file with -f or via stdin with -stdin")
+	}
+
+	// Temp target list for pulling in candidates
+	tmpTargetList := make([]string, 0)
+
+	// For target strings passed on the command line
+	if flag.NArg() > 0 {
+		for i := 0; i < flag.NArg(); i++ {
+			fmt.Println(flag.Arg(i))
+			tmpTargetList = append(tmpTargetList, flag.Arg(i))
+		}
 	}
 
 	targetList := make([]string, 0)
 
-	// If providing an input string
-	if *inputFilePtr == "" && !*stdinPtr {
-		if *incrementalPtr {
-			targetList = incrementalStringGenerator(input)
-		} else {
-			targetList = append(targetList, input)
-		}
-	}
-
 	// If reading from a file or stdin get the candidates into memory
-
-	tmpTargetList := make([]string, 0)
 	if *stdinPtr {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
