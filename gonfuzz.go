@@ -228,7 +228,7 @@ func main() {
 		}
 	}
 
-	// TODO must be a more efficient way of doing this
+	// Generate incremental lists based off of input, then merge
 	if *incrementalPtr {
 		for i := 0; i < len(tmpTargetList); i++ {
 			tmpList := incrementalStringGenerator(tmpTargetList[i])
