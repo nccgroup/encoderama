@@ -310,14 +310,21 @@ func urlEncodeSpecialOnly(input string) string {
 	return url.QueryEscape(input)
 }
 
-//TODO modify this to work on runes rather than splitting the string
+// Split by runes in order to extract specific unicode chars
 func incrementalStringGenerator(input string) []string {
 
 	incrementalStringList := make([]string, 0)
-	// Build the string up one character at a time
-	for i := 0; i < len(input); i++ {
-		incrementalStringList = append(incrementalStringList, input[0:i+1])
+	first := true
+
+	for _, r := range []rune(input) {
+		if first {
+			incrementalStringList = append(incrementalStringList, fmt.Sprintf("%s", string(r)))
+		} else {
+			incrementalStringList = append(incrementalStringList, fmt.Sprintf("%s%s", incrementalStringList[len(incrementalStringList)-1], string(r)))
+		}
+		first = false
 	}
+
 	return incrementalStringList
 }
 
@@ -335,7 +342,6 @@ func htmlEncodeAllAsDecimal(input string) string {
 	}
 	return outputString
 }
-
 func htmlEncodeAllAsHexLowercase(input string) string {
 	return htmlEncodeAllAsHex(input, true, false)
 }
