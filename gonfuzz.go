@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"unicode"
 )
 
 // Encoding scheme definition - this makes it a little easier to add new ones
@@ -168,19 +167,20 @@ func main() {
 		encodingSchemesEntered := strings.Split(*encodingSchemesPtr, ",")
 		errors := ""
 
-		//FIXME this is truly ghastly
-		for i := 0; i < len(encodingSchemesEntered); i++ {
+		// for each entered encoding scheme
+		for _, encSchemeEnt := range encodingSchemesEntered {
 			found := false
-			for s := 0; s < len(encodingSchemes); s++ {
-				for e := 0; e < len(encodingSchemes[i].params); e++ {
-					if encodingSchemes[s].params[e] == encodingSchemesEntered[i] {
+			// check each schemes params to see if it matches
+			for _, encScheme := range encodingSchemes {
+				for _, encSchemeParam := range encScheme.params {
+					if encSchemeParam == encSchemeEnt {
 						found = true
 						break
 					}
 				}
 			}
 			if !found {
-				errors = errors + " " + encodingSchemesEntered[i]
+				errors = errors + " " + encSchemeEnt
 			}
 		}
 
@@ -377,16 +377,7 @@ func htmlEncodeSpecialOnly(input string) string {
 	return html.EscapeString(input)
 }
 
-//TODO delete this eventually
-func isASCII(input string) bool {
-	for i := 0; i < len(input); i++ {
-		if input[i] > unicode.MaxASCII {
-			return false
-		}
-	}
-	return true
-}
-
+// Any of these in these?
 func Contains(a []string, x []string) bool {
 	for _, y := range x {
 		for _, n := range a {
@@ -398,6 +389,7 @@ func Contains(a []string, x []string) bool {
 	return false
 }
 
+// Used to build flag description for encoding scheme parameter docs
 func generateEncodingSchemeDocs(encodingSchemes []encodingScheme) string {
 	docs := ""
 
@@ -408,6 +400,7 @@ func generateEncodingSchemeDocs(encodingSchemes []encodingScheme) string {
 	return docs
 }
 
+// Generate comma seperated list of default encoding schemes to use
 func generateDefaultEncodingSchemes(encodingSchemes []encodingScheme) string {
 	defaultList := ""
 	first := true
