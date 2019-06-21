@@ -139,11 +139,6 @@ func main() {
 
 	flag.Parse()
 
-	if flag.NArg() == 0 && *stdinPtr == false && *inputFilePtr == "" {
-		flag.Usage()
-		os.Exit(1)
-	}
-
 	// Workout if more than one mode has been selected
 	modeCount := 0
 
@@ -161,6 +156,22 @@ func main() {
 
 	if modeCount > 1 {
 		log.Fatal("Pass a string either by: strings seperated by spaces on the command line, from an input file with -f or via stdin with -stdin")
+	}
+
+	// Check stdin, maybe the user didn't pass the arg for it..
+	//FIXME if doing echo test | ./gonfuzz it prints out test at the top
+	stdin := os.Stdin
+	stdinStat, _ := stdin.Stat()
+	stdinSize := stdinStat.Size()
+
+	if stdinSize > 0 {
+		*stdinPtr = true
+	}
+
+	// If no input modes were provided or stdin not detected, quit and show usage
+	if flag.NArg() == 0 && *stdinPtr == false && *inputFilePtr == "" {
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	// Validate encoding schemes provided actually exist
