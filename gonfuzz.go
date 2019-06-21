@@ -134,6 +134,7 @@ func main() {
 	incrementalPtr := flag.Bool("i", false, "For each input string, incrementally encode each character and print out the string")
 	stdinPtr := flag.Bool("stdin", false, "Read input strings from stdin")
 	inputFilePtr := flag.String("f", "", "File to read input strings from")
+	outputFilePtr := flag.String("o", "", "File to output results to")
 	encodingSchemesPtr := flag.String("e", generateDefaultEncodingSchemes(encodingSchemes), "Comma seperated list of encoding schemes to use\n"+generateEncodingSchemeDocs(encodingSchemes))
 
 	flag.Parse()
@@ -244,8 +245,8 @@ func main() {
 	encodingSchemesSelected := strings.Split(*encodingSchemesPtr, ",")
 
 	for i := 0; i < len(encodingSchemes); i++ {
-		// If no encodin schemes were provided, the defined structs already set
-		// the defaults earlier and thy will be set in the
+		// If no encoding schemes were provided, the encodingSchemes struct
+		// already specifies the defaults and they will be set inside the
 		// encodingSchemesSelected variable, we just need to enable as if they
 		// were passed on the command line
 		if Contains(encodingSchemesSelected, encodingSchemes[i].params) {
@@ -253,11 +254,27 @@ func main() {
 		}
 	}
 
+	// If an output file was defined:
+	var outputFile *os.File
+	var outputFileErr error
+	if *outputFilePtr != "" {
+		outputFile, outputFileErr = os.Create(*outputFilePtr)
+
+		if outputFileErr != nil {
+			log.Fatal(outputFileErr)
+		}
+		defer fmt.Printf("Outputing to: %s\n", *outputFilePtr)
+	}
+
 	// Process candidates and output
 	for e := 0; e < len(encodingSchemes); e++ {
 		if encodingSchemes[e].enabled {
 			for t := 0; t < len(targetList); t++ {
-				fmt.Println(encodingSchemes[e].method(targetList[t]))
+				if *outputFilePtr != "" {
+					outputFile.Write([]byte(encodingSchemes[e].method(targetList[t]) + "\n"))
+				} else {
+					fmt.Println(encodingSchemes[e].method(targetList[t]))
+				}
 			}
 		}
 	}
