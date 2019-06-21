@@ -12,6 +12,7 @@ import (
 	"unicode"
 )
 
+// Encoding scheme definition - this makes it a little easier to add new ones
 type encodingScheme struct {
 	params    []string
 	desc      string
@@ -162,7 +163,31 @@ func main() {
 		log.Fatal("Pass a string either by: strings seperated by spaces on the command line, from an input file with -f or via stdin with -stdin")
 	}
 
-	//TODO validate encodingschemes provided
+	// Validate encoding schemes provided actually exist
+	if *encodingSchemesPtr != "" {
+		encodingSchemesEntered := strings.Split(*encodingSchemesPtr, ",")
+		errors := ""
+
+		//FIXME this is truly ghastly
+		for i := 0; i < len(encodingSchemesEntered); i++ {
+			found := false
+			for s := 0; s < len(encodingSchemes); s++ {
+				for e := 0; e < len(encodingSchemes[i].params); e++ {
+					if encodingSchemes[s].params[e] == encodingSchemesEntered[i] {
+						found = true
+						break
+					}
+				}
+			}
+			if !found {
+				errors = errors + " " + encodingSchemesEntered[i]
+			}
+		}
+
+		if errors != "" {
+			log.Fatal("The following encoding schemes could not be matched:" + errors)
+		}
+	}
 
 	// Temp target list for pulling in candidates
 	tmpTargetList := make([]string, 0)
