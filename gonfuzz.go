@@ -129,6 +129,20 @@ func main() {
 			enabled:   false,
 			method:    doubleHtmlEncodeSpecialOnly,
 		},
+		encodingScheme{
+			params:    []string{"x", "hex"},
+			desc:      "Hex encode characters: 'x' --> '\\x78'",
+			isDefault: false,
+			enabled:   false,
+			method:    hexEncode,
+		},
+		encodingScheme{
+			params:    []string{"rx", "rawhex"},
+			desc:      "Hex encode characters: 'x' --> '78'",
+			isDefault: false,
+			enabled:   false,
+			method:    rawHexEncode,
+		},
 	}
 
 	incrementalPtr := flag.Bool("i", false, "For each input string, incrementally encode each character and print out the string")
@@ -409,6 +423,28 @@ func doubleHtmlEncodeSpecialOnly(input string) string {
 
 func htmlEncodeSpecialOnly(input string) string {
 	return html.EscapeString(input)
+}
+
+func hexEncode(input string) string {
+	return hexEncodeWrapper(input, false)
+}
+
+func rawHexEncode(input string) string {
+	return hexEncodeWrapper(input, true)
+}
+
+func hexEncodeWrapper(input string, raw bool) string {
+	outputString := ""
+
+	r := []rune(input)
+	for i := 0; i < len(r); i++ {
+		if raw {
+			outputString = outputString + fmt.Sprintf("%X", r[i])
+		} else {
+			outputString = outputString + fmt.Sprintf("\\x%X", r[i])
+		}
+	}
+	return outputString
 }
 
 // Any of these in these?
