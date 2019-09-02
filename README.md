@@ -1,16 +1,16 @@
 # encoderama
 
-`encoderama` is a simple tool for encoding input strings or wordlists and using the output primarily fuzzing web applications. 
+`encoderama` is a simple tool for encoding input strings or wordlists then using the output to, primarily, fuzz web applications. 
 
 ## Building
 
 Assuming you have golang installed...
 
-`go build`
+git clone and `go build`
 
 ## Usage
 
-To see the help run `./encodarama` without arguments.
+To see the usuage run `./encodarama` without any arguments.
 
 The default encoding types are:
 
@@ -20,7 +20,7 @@ The default encoding types are:
 
 ## Examples
 
-URL encode and Double URL encode key characters (also plaintext):
+URL encode and double URL encode key characters (also plaintext):
 
 ```bash
 ./encoderama -f /tmp/input.txt -e p,u,du
@@ -38,7 +38,7 @@ Hello%2BWorld
 So%2Bis%2B%252B
 ```
 
-URL encode injection test string but built up the string one char at a time
+URL encode an injection test string but build up the string one char at a time:
 
 ```bash
 ./encoderama -i -e u '">;!--\"<xss>=&{()}'
