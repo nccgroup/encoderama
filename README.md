@@ -12,6 +12,12 @@ Assuming you have golang installed...
 
 To see the help run `./encodarama` without arguments.
 
+The default encoding types are:
+
+* Output plain (p)
+* URL encode key characters (u)
+* HTML encode key characters (h)
+
 ## Examples
 
 URL encode and Double URL encode key characters (also plaintext):
